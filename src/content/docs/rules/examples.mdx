@@ -3,14 +3,16 @@ type: overview
 pcx_content_type: navigation
 title: Examples
 sidebar:
-  order: 1
+  order: 2
 ---
 
-import { ListExamples, GlossaryTooltip } from "~/components";
+import { ResourcesBySelector, GlossaryTooltip } from "~/components";
 
 Explore the following <GlossaryTooltip term="code example">examples</GlossaryTooltip> for Rules.
 
-<ListExamples
-	filters={["products", "goal", "operation"]}
+<ResourcesBySelector
+	directory="rules/examples/"
+	types={["example"]}
 	additionalProducts={["Cache Rules"]}
+filterables={["products", "goal", "operation"]}
 />

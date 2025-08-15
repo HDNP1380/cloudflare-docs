@@ -9,11 +9,7 @@ sidebar:
 
 ---
 
-import { Render } from "~/components"
-
 Simulcasting lets you forward your live stream to third-party platforms such as Twitch, YouTube, Facebook, Twitter, and more. You can simulcast to up to 50 concurrent destinations from each live input. To begin simulcasting, select an input and add one or more Outputs.
-
-<Render file="chromecast_limitations" />
 
 ## Add an Output using the API
 
@@ -62,5 +58,7 @@ By default, all live outputs are enabled.
 | ------------------------------------------------------------------------ | -------- | ------------------------------------------------------------------------ |
 | [List outputs](/api/resources/stream/subresources/live_inputs/methods/list/)      | `GET`    | `accounts/:account_identifier/stream/live_inputs`                        |
 | [Delete outputs](/api/resources/stream/subresources/live_inputs/methods/delete/) | `DELETE` | `accounts/:account_identifier/stream/live_inputs/:live_input_identifier` |
+| [List All Outputs Associated With A Specified Live Input](/api/resources/stream/subresources/live_inputs/subresources/outputs/methods/list/) | `GET` | `/accounts/{account_id}/stream/live_inputs/{live_input_identifier}/outputs` |
+| [Delete An Output](/api/resources/stream/subresources/live_inputs/subresources/outputs/methods/delete/) | `DELETE` | `/accounts/{account_id}/stream/live_inputs/{live_input_identifier}/outputs/{output_identifier}` |
 
 If the associated live input is already retransmitting to this output when you make the `DELETE` request, that output will be disconnected within 30 seconds.

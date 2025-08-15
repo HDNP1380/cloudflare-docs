@@ -12,6 +12,11 @@ sidebar:
 
 import { FeatureTable, GlossaryTooltip, Render } from "~/components"
 
+:::caution[Deprecation notice]
+Mirage is being deprecated and will be removed on September 15, 2025.
+As an alternative, Cloudflare recommends using [lazy loading](/images/tutorials/optimize-mobile-viewing/) and [responsive images](/images/transform-images/make-responsive-images/) to optimize image performance for all devices.
+:::
+
 Cloudflare Mirage reduces bandwidth used by images in mobile browsers. It can accelerate loading of image-heavy websites on very slow mobile connections and HTTP/1.
 
 It does this by:
@@ -51,7 +56,7 @@ Mirage will work with the following image formats:
 :::note
 
 If you send a <GlossaryTooltip term="content security policy (CSP)">Content Security Policy (CSP)</GlossaryTooltip> header that restricts where scripts can be loaded, you will need to ensure `ajax.cloudflare.com` is enabled. For example, to allow scripts from your own domain and `ajax.cloudflare.com` enter the following:
-`script-src 'self' ajax.cloudflare.com;` 
+`script-src 'self' ajax.cloudflare.com;`
 :::
 
 To enable Mirage image optimization for your entire domain:

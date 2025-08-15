@@ -5,6 +5,8 @@ sidebar:
   order: 6
 ---
 
+import { GlossaryTooltip } from "~/components";
+
 When the WARP client is deployed on a device, Cloudflare will process all DNS queries and network traffic by default. However, under certain circumstances, you may need to exclude specific DNS queries or network traffic from WARP. For example, you may need to resolve an internal hostname with a private DNS resolver instead of Cloudflare's [public DNS resolver](/1.1.1.1/).
 
 Cloudflare recommends Enterprise users configure [Gateway resolver policies](/cloudflare-one/policies/gateway/resolver-policies/) to resolve traffic with custom resolvers. WARP will send private DNS queries to Gateway, then Gateway will send the queries to custom resolvers based on matching policies.
@@ -27,28 +29,72 @@ When you use the WARP client together with `cloudflared` Tunnels or third-party 
 
 ```mermaid
 flowchart TD
-    D["WARP client proxies DNS traffic to specified fallback server"] -- Resolver IP included in Tunnel per Split Tunnel configuration --> E["Query sent via WARP Tunnel to be resolved"]
-    D -- Resolver IP not included in Tunnel per Split Tunnel configuration --> F["Query sent to resolver IP outside WARP Tunnel"]
-    E -- Blocked by Gateway --> G["Traffic blocked by Cloudflare"]
-    E -- Allowed by Gateway --> H["Evaluated by Cloudflare Tunnel routes"]
-    H -- Tunnel routes do not include resolver IP --> I["Gateway proxies query to resolver IP via normal WARP egress route"]
-    H -- Tunnel routes include resolver IP --> J["Cloudflare Tunnel advertises route that includes Resolver IP"]
-    J --> L["Private resolver returns IP address to WARP client"]
-    n1["Local Domain Fallback"] -- Matches domain --> C["WARP client resolves query according to Gateway policies"]
-    n1 -- Does not match domain --> D
-    A["WARP user requests resource"] --> n2["Gateway resolver policies"]
-    n2 -- Does not match traffic --> n1
-    n2 -- Matches traffic --> C
+    A["WARP user requests resource"] --> B["WARP client proxies all DNS traffic"]
+    B -- WARP checks if domain is listed in Local Domain Fallback policies --> C["Local Domain Fallback"]
 
-    D@{ shape: rect}
-    E@{ shape: hex}
-    F@{ shape: terminal}
-    G@{ shape: terminal}
-    H@{ shape: hex}
-    I@{ shape: terminal}
-    L@{ shape: terminal}
-    n1@{ shape: hex}
-    C@{ shape: terminal}
-    A@{ shape: in-out}
-    n2@{ shape: proc}
+    %% Left branch (LDF exists)
+    C -- Domain exists in Local Domain Fallback policies --> ST["Split Tunnel processing"]
+
+    ST -- Resolver IP included in WARP Tunnel per Split Tunnel configuration --> QW["Query sent via WARP Tunnel to be resolved"]
+    ST -- Resolver IP not included in WARP Tunnel per Split Tunnel configuration --> QO["Query sent to resolver IP outside WARP Tunnel"]
+
+    QW -- Allowed by Gateway --> OR["Evaluated by Cloudflare on-ramp routes"]
+    OR -- Onramp routes do not include resolver IP --> GP["Gateway proxies query to resolver IP via normal WARP egress route"]
+    OR -- Onramp routes include, resolver IP --> ADV["Cloudflare onramps advertises route that includes Resolver IP"]
+    ADV --> PR["Private resolver returns IP address to WARP client"]
+
+    %% Right branch (no LDF match)
+    C -- Domain does not exist in Local Domain Fallback policies --> GWR["Gateway checks Resolver Policies (Enterprise only)"]
+
+    GWR -- Resolver policy is not matched --> C1111a["1.1.1.1"]
+
+    GWR -- Resolver policy is matched --> IDNS["Internal DNS"]
+    GWR -- Resolver policy is matched --> C1111b["1.1.1.1"]
+    GWR -- Resolver policy is matched --> CUST["Custom resolver"]
+    CUST --> PNS["Private network services<br>(Cloudflare Tunnel, Magic WAN, WARP Connector)"]
 ```
+#### Terms mentioned
+####  On-ramps (how traffic gets onto Cloudflare)
+- <GlossaryTooltip term = "on-ramp">On-ramp</GlossaryTooltip>
+- [Cloudflare Tunnel](/cloudflare-one/connections/connect-networks/)
+- [WARP Connector](/cloudflare-one/connections/connect-networks/private-net/warp-connector/)
+- [Magic WAN](/magic-wan/)
+
+#### Routing features (how queries are handled)
+- [Local Domain Fallback](/cloudflare-one/connections/connect-devices/warp/configure-warp/route-traffic/local-domains/)
+- [Split Tunnels](/cloudflare-one/connections/connect-devices/warp/configure-warp/route-traffic/split-tunnels/)
+- [Gateway Resolver Policies](/cloudflare-one/policies/gateway/resolver-policies/)
+
+#### Resolvers (where queries are resolved)
+- [Internal DNS](/dns/internal-dns/)
+- [1.1.1.1](/1.1.1.1/)
+
+
+
+## Add a DNS suffix
+
+Support for DNS suffix search lists in WARP is currently in development. You can manually configure DNS suffixes at the device level using the following instructions.
+
+### macOS
+
+To manually configure a DNS suffix on macOS:
+
+1. Open **System Settings** (or **System Preferences** on older macOS versions).
+2. Go to **Network** and select your active connection (**Wi-Fi** or **Ethernet**).
+3. Select **Details** (or **Advanced**).
+4. Go to the **DNS** tab.
+5. Under **Search Domains**, select the `+` button and add your DNS suffix.
+6. Select **OK**, then **Apply**.
+
+### Windows
+
+To manually configure a DNS suffix on Windows:
+
+1. Open the **Search** bar in Windows, type **View network connections**, and select **Open**.
+2. Right-click the network adapter (**Wi-Fi** or **Ethernet**) you want to modify and select **Properties**. (Admin privileges required.)
+3. Double-click **Internet Protocol Version 4 (TCP/IPv4)**.
+4. In the **Internet Protocol (TCP/IP) Properties** window, select **Advanced**.
+5. Go to the **DNS** tab.
+6. Select **Append these DNS suffixes (in order)**.
+7. Select **Add**, enter your DNS suffix and select **Add**.
+8. Select **OK** on all windows to apply changes.

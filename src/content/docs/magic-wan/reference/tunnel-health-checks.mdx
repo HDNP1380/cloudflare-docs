@@ -4,22 +4,22 @@ pcx_content_type: concept
 head: []
 description: Magic WAN uses probes to check for tunnel health. Review
   information on this page to learn more.
+sidebar:
+  order: 7
 ---
 
 import { Render } from "~/components";
 
 <Render
-	file="tunnel-health/tunnel-health-checks"
-	product="magic-transit"
+	file="reference/tunnel-health-checks"
+	product="networking-services"
 	params={{
-		healthCheckFrequencyURL:
-			"/magic-wan/configuration/common-settings/tunnel-health-checks/",
+		magicWord: "Magic WAN",
+		addTunnels: "/magic-wan/configuration/manually/how-to/configure-tunnel-endpoints/#add-tunnels",
+		changeHealthCheckRate: "/magic-wan/configuration/common-settings/tunnel-health-checks-frequency/",
+		probeHealth: "#health-state-and-prioritization",
 		productName: "Magic WAN",
-		onboardingURL:
-			"/magic-wan/configuration/manually/how-to/configure-static-routes/",
-		configureTunnelEndpointsURL:
-			"/magic-wan/configuration/manually/how-to/configure-tunnels/",
-		urlChangeHealthCheckType:
-			"/magic-wan/configuration/manually/how-to/configure-tunnels/#add-tunnels",
+		staticRoutes: "/magic-wan/configuration/manually/how-to/configure-routes/",
+		tunnelEndpoints: "/magic-wan/configuration/manually/how-to/configure-tunnel-endpoints/"
 	}}
 />
